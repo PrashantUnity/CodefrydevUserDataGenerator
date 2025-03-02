@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Data Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e5e9f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 600px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    form label {
+      margin-top: 10px;
+    }
+
+    form input {
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+
+    button {
+      background-color: #28966a;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #227b56;
+    }
+
+    pre {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    #linksContainer .linkField {
+      margin-bottom: 15px;
+    }
+
+    #addLink {
+      background-color: #e09d62;
+      margin-top: 10px;
+    }
+
+    #addLink:hover {
+      background-color: #c57e50;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>User Data Generator</h1>
+    <form id="dataForm">
+      <label for="name">Title:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="subtitle">Subtitle:</label>
+      <input type="text" id="subtitle" name="subtitle" required>
+
+      <label for="profileImage">Profile Image (URL):</label>
+      <input type="text" id="profileImage" name="profileImage" required>
+
+      <label for="backgroundColor">Background Color:</label>
+      <input type="color" id="backgroundColor" name="backgroundColor" required>
+
+      <label for="containerBackground">Container Background:</label>
+      <input type="color" id="containerBackground" name="containerBackground" required>
+
+      <div id="linksContainer">
+        <div class="linkField">
+          <label for="linkName">Link Name:</label>
+          <input type="text" class="linkName" name="linkName" placeholder="Name of link (e.g., Website (Alpha))">
+
+          <label for="linkUrl">Link URL:</label>
+          <input type="url" class="linkUrl" name="linkUrl" placeholder="URL of the link">
+        </div>
+      </div>
+
+      <button type="button" id="addLink">Add Another Link</button>
+      <button type="submit">Generate Website</button>
+    </form>
+
+    <h2>Generated Website Data</h2>
+    <pre id="generatedData"></pre>
+  </div>
+
+  <script>
+    document.getElementById('dataForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const subtitle = document.getElementById('subtitle').value;
+      const profileImage = document.getElementById('profileImage').value;
+      const backgroundColor = document.getElementById('backgroundColor').value;
+      const containerBackground = document.getElementById('containerBackground').value;
+
+      const links = [];
+      const linkNames = document.querySelectorAll('.linkName');
+      const linkUrls = document.querySelectorAll('.linkUrl');
+
+      for (let i = 0; i < linkNames.length; i++) {
+        if (linkNames[i].value && linkUrls[i].value) {
+          links.push({
+            name: linkNames[i].value,
+            url: linkUrls[i].value
+          });
+        }
+      }
+
+      const data = `
+---
+title: "${name}"
+profile_image: "${profileImage}"
+listProfile_image: "/about/users/${profileImage.split('/').pop()}"
+subtitle: "${subtitle}"
+layout: "users/single"
+weight: 1
+
+colors:
+  background: "${backgroundColor}"
+  container_background: "${containerBackground}"
+  link_background: "#a5be8c8f"
+  link_hover: "#e09d62"
+
+links:
+  ${links.map(link => `- name: "${link.name}"
+    url: "${link.url}"`).join('\n  ')}
+---
+      `;
+
+      document.getElementById('generatedData').textContent = data.trim();
+    });
+
+    document.getElementById('addLink').addEventListener('click', function() {
+      const linksContainer = document.getElementById('linksContainer');
+      const newLinkField = document.createElement('div');
+      newLinkField.classList.add('linkField');
+      
+      newLinkField.innerHTML = `
+        <label for="linkName">Link Name:</label>
+        <input type="text" class="linkName" name="linkName" placeholder="Name of link (e.g., Website (Alpha))">
+
+        <label for="linkUrl">Link URL:</label>
+        <input type="url" class="linkUrl" name="linkUrl" placeholder="URL of the link">
+      `;
+      
+      linksContainer.appendChild(newLinkField);
+    });
+  </script>
+</body>
+</html>
